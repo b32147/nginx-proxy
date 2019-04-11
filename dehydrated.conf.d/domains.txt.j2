@@ -1,0 +1,5 @@
+# Define all root domains here
+{% set domains = PROXY_SSL_ROOT_DOMAINS.split(',') %}
+{% for domain in domains %}
+*.{{ domain }} > {{ domain }}
+{% endfor %}

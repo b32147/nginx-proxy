@@ -1,14 +1,31 @@
 version: '2'
 services:
   nginx-proxy:
-    image: jwilder/nginx-proxy
-    container_name: nginx-proxy
+    build: ./
+    container_name: proxy
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-
-  whoami:
-    image: jwilder/whoami
+      - /Users/blarson/Macdata/nginx-proxy/ssl.d:/root/ssl.d
+    env_file:
+      - proxy.env
     environment:
-      - VIRTUAL_HOST=whoami.local
+      PROXY_SSL_CERTS_DIR: /root/ssl.d
+      PROXY_SSL_ROOT_DOMAINS: in.macdata.io
+      PROXY_SSL_CONTACT: bryan@macdata.io
+
+  nginx-proxy-whoami:
+    image: jwilder/whoami
+    container_name: proxy-whoami
+    environment:
+      - VIRTUAL_HOST=vault.in.macdata.io
+      - HTTPS_METHOD=redirect
+
+  nginx-proxy-whoami-2:
+    image: jwilder/whoami
+    container_name: proxy-whoami-2
+    environment:
+      - VIRTUAL_HOST=whoami.in.macdata.io
+      - HTTPS_METHOD=nohttps

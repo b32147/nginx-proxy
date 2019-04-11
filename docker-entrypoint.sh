@@ -31,4 +31,18 @@ if [ "$socketMissing" = 1 -a "$1" = forego -a "$2" = start -a "$3" = '-r' ]; the
 	exit 1
 fi
 
+# Create the Dehydrated configuration files
+j2 /app/dehydrated.conf.d/config.j2 > /app/config
+j2 /app/dehydrated.conf.d/hook.j2 > /app/hook
+j2 /app/dehydrated.conf.d/domains.txt.j2 > /app/domains.txt
+
+# Set needed permissions on executables
+chmod +x "/app/hook"
+
+# Register with LetsEncrypt
+/usr/local/bin/dehydrated --register --accept-terms
+
+# Get the first certs
+/app/certs.sh
+
 exec "$@"
